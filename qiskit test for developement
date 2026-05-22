@@ -1,0 +1,68 @@
+# Quantum Lunar Colony Simulation v1.2
+# Author: Gil (AegisNode)
+# Description:
+# This Qiskit simulation models a resilient lunar colony with defense systems,
+# infrastructure expansion, and emergency protocols. Each qubit represents a subsystem.
+
+from qiskit import QuantumCircuit, Aer, execute
+
+# Create a circuit with 15 qubits (0–14) and 15 classical bits for measurement
+qc = QuantumCircuit(15, 15)
+
+# --- Base Colony Systems ---
+qc.h(0)   # Solar energy (power source)
+qc.h(1)   # Water recycling
+qc.h(2)   # Oxygen recycling
+qc.h(3)   # Artificial gravity
+qc.x(4)   # Radiation hazard
+qc.x(5)   # Asteroid impact
+qc.h(6)   # Triple dome system
+qc.h(7)   # Robotic crane (dome replacement)
+qc.h(8)   # Defensive weapons (laser/plasma)
+qc.h(9)   # Electromagnetic shield (mini magnetosphere)
+qc.h(10)  # Internal self-repair (water recovery)
+
+# --- New Infrastructure ---
+qc.h(11)  # SpaceX ships (transport machinery/robots)
+qc.h(12)  # Satellite (fast communication/coordination)
+qc.h(13)  # Emergency materials (backup supplies)
+qc.h(14)  # Probe (advanced sensor for terrain & communication)
+
+# --- Logic Connections ---
+# Energy distribution
+qc.cx(0, 1)   # Energy → Water
+qc.cx(0, 2)   # Energy → Oxygen
+qc.cx(0, 3)   # Energy → Gravity
+
+# Hazards
+qc.cx(4, 1)   # Radiation damages Water
+qc.cx(5, 6)   # Asteroid damages Domes
+
+# Repair & defense
+qc.cx(6, 7)   # Domes activate Crane
+qc.cx(7, 10)  # Crane triggers Self-repair
+qc.cx(4, 8)   # Radiation triggers Weapons
+qc.cx(5, 8)   # Asteroid triggers Weapons
+qc.cx(4, 9)   # Radiation activates Shield
+qc.cx(5, 9)   # Asteroid activates Shield
+qc.cx(0, 10)  # Energy supports Self-repair
+
+# Infrastructure expansion
+qc.cx(11, 7)   # SpaceX ships deliver robots → Crane efficiency
+qc.cx(12, 9)   # Satellite boosts Shield communication
+qc.cx(12, 8)   # Satellite coordinates Weapons faster
+qc.cx(13, 10)  # Emergency materials support Self-repair
+qc.cx(14, 12)  # Probe enhances Satellite communication
+qc.cx(14, 11)  # Probe guides SpaceX ships for precise delivery
+
+# --- Measurements ---
+for i in range(15):
+    qc.measure(i, i)
+
+# --- Run Simulation ---
+simulator = Aer.get_backend('qasm_simulator')
+result = execute(qc, simulator, shots=1024).result()
+counts = result.get_counts(qc)
+
+print("Simulation results:", counts)
+qc.draw('mpl')
